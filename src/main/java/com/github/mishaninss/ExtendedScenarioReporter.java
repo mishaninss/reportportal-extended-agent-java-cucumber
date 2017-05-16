@@ -12,6 +12,7 @@ import gherkin.formatter.model.Step;
 import java.util.Calendar;
 
 /**
+ *
  * Created by Sergey_Mishanin on 3/13/17.
  */
 public class ExtendedScenarioReporter extends ExtendedAbstractReporter {

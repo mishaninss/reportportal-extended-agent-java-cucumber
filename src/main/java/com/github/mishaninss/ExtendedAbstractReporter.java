@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.*;
 
 /**
+ * Extended Cucumber JVM client for Report Portal with support of parallel execution and retries
  * Created by Sergey_Mishanin on 3/13/17.
  */
 public abstract class ExtendedAbstractReporter extends AbstractReporter {
@@ -104,7 +105,7 @@ public abstract class ExtendedAbstractReporter extends AbstractReporter {
             try {
                 FileUtils.write(file, "in progress");
             } catch (IOException ex){
-                LOGGER.debug("Could create in progress file", ex);
+                throw new RuntimeException("Could not create in progress file", ex);
             }
         }
     }
@@ -114,7 +115,7 @@ public abstract class ExtendedAbstractReporter extends AbstractReporter {
             try {
                 launchProperties = loadProperties(LAUNCH_PROP_FILE);
             } catch (IOException ex) {
-                LOGGER.debug("Could not load launch properties file", ex);
+                throw new RuntimeException("Could not load launch properties file", ex);
             }
         }
     }
@@ -124,7 +125,7 @@ public abstract class ExtendedAbstractReporter extends AbstractReporter {
             try (FileOutputStream fos = new FileOutputStream(LAUNCH_PROP_FILE)){
                 launchProperties.store(fos, null);
             } catch (IOException ex) {
-                LOGGER.debug("Could save launch properties file", ex);
+                throw new RuntimeException("Could not save launch properties file", ex);
             }
         }
     }
@@ -151,7 +152,7 @@ public abstract class ExtendedAbstractReporter extends AbstractReporter {
                         Utils.finishTestItem(featureId);
                     }
                 } catch (IOException ex){
-                    LOGGER.debug("Could not load feature properties", ex);
+                    throw new RuntimeException("Could not load feature properties", ex);
                 }
             }
         }
@@ -161,11 +162,7 @@ public abstract class ExtendedAbstractReporter extends AbstractReporter {
         if (!LAUNCH_PROP_FILE.exists()){
             Date start = new Date();
             while(!LAUNCH_PROP_FILE.exists() && (new Date().getTime()-start.getTime()<60000)){
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException ex) {
-                    LOGGER.debug("Ignored exception", ex);
-                }
+                sleep(2000);
             }
             return LAUNCH_PROP_FILE.exists();
         } else {
@@ -180,7 +177,7 @@ public abstract class ExtendedAbstractReporter extends AbstractReporter {
         try {
             FileUtils.write(featureLockFile, "in progress");
         } catch (IOException ex) {
-            LOGGER.debug("Could create feature lock file", ex);
+            throw new RuntimeException("Could create feature lock file", ex);
         }
 
         currentFeatureId = Utils.startNonLeafNode(currentLaunchId, getRootItemId(),
@@ -193,7 +190,7 @@ public abstract class ExtendedAbstractReporter extends AbstractReporter {
         try (FileOutputStream fos = new FileOutputStream(featurePropertiesFile)){
             featureProperties.store(fos, null);
         } catch (IOException ex) {
-            LOGGER.debug("Could save feature properties file", ex);
+            throw new RuntimeException("Could save feature properties file", ex);
         }
 
         FileUtils.deleteQuietly(featureLockFile);
@@ -232,11 +229,7 @@ public abstract class ExtendedAbstractReporter extends AbstractReporter {
             if (featureInProgressFile.exists()) {
                 Date start = new Date();
                 while (featureInProgressFile.exists() && (new Date().getTime() - start.getTime() < 60000)) {
-                    try {
-                        Thread.sleep(2000);
-                    } catch (InterruptedException ex) {
-                        LOGGER.debug("Ignored exception", ex);
-                    }
+                    sleep(2000);
                 }
                 return readFeatureProperties(featureId);
             } else {
@@ -251,6 +244,14 @@ public abstract class ExtendedAbstractReporter extends AbstractReporter {
             value = value.substring(0, 152) + "...]";
         }
         return value;
+    }
+
+    private static void sleep(int timeout){
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException ex) {
+            LOGGER.debug("Ignored InterruptedException exception", ex);
+        }
     }
 
     protected abstract void setRootItemId(String rootItemId);
