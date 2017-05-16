@@ -1,4 +1,4 @@
-package com.github.mishaninss;
+package com.github.mishaninss.reportportal;
 
 import com.epam.reportportal.cucumber.AbstractReporter;
 import com.epam.reportportal.cucumber.Utils;
