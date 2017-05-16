@@ -29,8 +29,8 @@ import java.util.*;
 /**
  * Created by Sergey_Mishanin on 3/13/17.
  */
-public abstract class ParallelAbstractReporter extends AbstractReporter {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ParallelAbstractReporter.class);
+public abstract class ExtendedAbstractReporter extends AbstractReporter {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExtendedAbstractReporter.class);
 
     private static final java.io.File LAUNCH_PROP_FILE = new java.io.File("./target/rp_launch.properties");
     private static final String LAUNCH_ID_PROPERTY_NAME = "launchId";
@@ -47,13 +47,13 @@ public abstract class ParallelAbstractReporter extends AbstractReporter {
     protected Properties launchProperties = new Properties();
     private Properties featureProperties = new Properties();
     private int retryNumber = 0;
-    private int maxRetryCount = Integer.parseInt(System.getProperty(CUCUMBER_RETRY_COUNT_PROPERTY_NAME, "0"));
+    private int maxRetryCount = 0;
 
-    protected static class XScenarioModel extends ScenarioModel {
+    protected static class ExtendedScenarioModel extends ScenarioModel {
         private Set<String> tags;
         private String description;
 
-        XScenarioModel(String newId) {
+        ExtendedScenarioModel(String newId) {
             super(newId);
         }
 
@@ -74,8 +74,13 @@ public abstract class ParallelAbstractReporter extends AbstractReporter {
         }
     }
 
-    protected ParallelAbstractReporter() {
+    protected ExtendedAbstractReporter() {
         super();
+        try {
+            maxRetryCount = Integer.parseInt(System.getProperty(CUCUMBER_RETRY_COUNT_PROPERTY_NAME, "0"));
+        } catch (NumberFormatException e){
+            maxRetryCount = 0;
+        }
     }
 
     private static int calculateRunClassesCount(){
@@ -179,7 +184,7 @@ public abstract class ParallelAbstractReporter extends AbstractReporter {
         }
 
         currentFeatureId = Utils.startNonLeafNode(currentLaunchId, getRootItemId(),
-                Utils.buildStatementName(feature, null, ParallelAbstractReporter.COLON_INFIX, null), currentFeatureUri, feature.getTags(),
+                Utils.buildStatementName(feature, null, ExtendedAbstractReporter.COLON_INFIX, null), currentFeatureUri, feature.getTags(),
                 getFeatureTestItemType());
 
         featureProperties = new Properties();
@@ -286,11 +291,11 @@ public abstract class ParallelAbstractReporter extends AbstractReporter {
     @Override
     protected void beforeScenario(Scenario scenario, String outlineIteration) {
         String id = Utils.startNonLeafNode(currentLaunchId, currentFeatureId,
-                Utils.buildStatementName(scenario, null, ParallelAbstractReporter.COLON_INFIX, outlineIteration),
+                Utils.buildStatementName(scenario, null, ExtendedAbstractReporter.COLON_INFIX, outlineIteration),
                 currentFeatureUri + ":" + scenario.getLine(), scenario.getTags(), getScenarioTestItemType());
-        currentScenario = new XScenarioModel(id);
-        ((XScenarioModel)currentScenario).setTags(Utils.extractTags(scenario.getTags()));
-        ((XScenarioModel)currentScenario).setDescription(currentFeatureUri + ":" + scenario.getLine());
+        currentScenario = new ExtendedScenarioModel(id);
+        ((ExtendedScenarioModel)currentScenario).setTags(Utils.extractTags(scenario.getTags()));
+        ((ExtendedScenarioModel)currentScenario).setDescription(currentFeatureUri + ":" + scenario.getLine());
     }
 
     /**
@@ -303,10 +308,10 @@ public abstract class ParallelAbstractReporter extends AbstractReporter {
         }
 
         if (currentScenario.getStatus().equals(Statuses.PASSED) && retryNumber > 0) {
-            Set<String> tags = ((XScenarioModel)currentScenario).getTags();
+            Set<String> tags = ((ExtendedScenarioModel)currentScenario).getTags();
             tags.add("@Retry");
             try {
-                updateTestItem(currentScenario.getId(), ((XScenarioModel)currentScenario).getDescription(), tags);
+                updateTestItem(currentScenario.getId(), ((ExtendedScenarioModel)currentScenario).getDescription(), tags);
             } catch (Exception ex) {
                 LOGGER.debug("Unable to update test item", ex);
             }

@@ -14,12 +14,12 @@ import java.util.Calendar;
 /**
  * Created by Sergey_Mishanin on 3/13/17.
  */
-public class ParallelScenarioReporter extends ParallelAbstractReporter {
+public class ExtendedScenarioReporter extends ExtendedAbstractReporter {
     private static final String SEPARATOR = "-------------------------";
 
     private String rootSuiteId;
 
-    public ParallelScenarioReporter() {
+    public ExtendedScenarioReporter() {
         super();
         rootSuiteId = null;
     }
@@ -120,7 +120,7 @@ public class ParallelScenarioReporter extends ParallelAbstractReporter {
      * @return decorated message
      */
     private String decorateMessage(String message) {
-        return ParallelScenarioReporter.SEPARATOR + message + ParallelScenarioReporter.SEPARATOR;
+        return ExtendedScenarioReporter.SEPARATOR + message + ExtendedScenarioReporter.SEPARATOR;
     }
 
     @Override
