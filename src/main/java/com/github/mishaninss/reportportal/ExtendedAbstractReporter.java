@@ -76,7 +76,7 @@ public abstract class ExtendedAbstractReporter extends AbstractReporter {
 
         public void setStatus(String status){
             try {
-                FieldUtils.writeField(this, "status", status);
+                FieldUtils.writeField(this, "status", status, true);
             } catch (IllegalAccessException e) {
                 LOGGER.debug("Could not set scenario status to " + status, e);
             }
