@@ -47,8 +47,8 @@ public abstract class ExtendedAbstractReporter extends AbstractReporter {
     private Scenario currentGherkinScenario;
     protected Properties launchProperties = new Properties();
     private Properties featureProperties = new Properties();
-    private int retryNumber = 0;
-    private int maxRetryCount = 0;
+    protected int retryNumber = 0;
+    protected int maxRetryCount = 0;
 
     protected static class ExtendedScenarioModel extends ScenarioModel {
         private Set<String> tags;

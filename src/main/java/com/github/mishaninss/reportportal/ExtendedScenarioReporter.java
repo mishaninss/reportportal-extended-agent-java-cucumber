@@ -34,7 +34,9 @@ public class ExtendedScenarioReporter extends ExtendedAbstractReporter {
     @Override
     protected void afterScenario() {
         super.afterScenario();
-        ReportPortalListenerContext.setRunningNowItemId(null);
+        if (!Statuses.FAILED.equalsIgnoreCase(currentScenario.getStatus()) || retryNumber >= maxRetryCount) {
+            ReportPortalListenerContext.setRunningNowItemId(null);
+        }
     }
 
     @Override
