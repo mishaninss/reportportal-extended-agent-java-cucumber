@@ -73,6 +73,14 @@ public abstract class ExtendedAbstractReporter extends AbstractReporter {
         public void setTags(Set<String> tags) {
             this.tags = tags;
         }
+
+        public void setStatus(String status){
+            try {
+                FieldUtils.writeField(this, "status", status);
+            } catch (IllegalAccessException e) {
+                LOGGER.debug("Could not set scenario status to " + status, e);
+            }
+        }
     }
 
     protected ExtendedAbstractReporter() {
@@ -305,6 +313,7 @@ public abstract class ExtendedAbstractReporter extends AbstractReporter {
     @Override
     protected void afterScenario() {
         if (Statuses.FAILED.equalsIgnoreCase(currentScenario.getStatus()) && retryNumber < maxRetryCount){
+            ((ExtendedScenarioModel)currentScenario).setStatus(Statuses.PASSED);
             return;
         }
 
