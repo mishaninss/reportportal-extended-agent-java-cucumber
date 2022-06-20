@@ -1,0 +1,124 @@
+public static void main(String[] args) throws AWTException
+{
+    Robot r = new Robot();
+    Date start = new Date();
+    while (new Date().getTime() - start.getTime() < 1200000){
+        simulateAction(r);
+        r.delay(10000);
+    }
+}
+
+public static void simulateAction(Robot robot){
+    int action = random.nextInt(4);
+    switch(action){
+        case 0: simulateKeybord(robot, random.nextInt(40) + 10); break;
+        case 1: simulateMouseMove(robot); break;
+        case 2: mouseClick(robot); break;
+        case 3: mouseWheel(robot, random.nextInt(40) - 20);
+    }
+}
+
+public static void moveMouse(Robot robot, int x, int y){
+    System.out.println("move mouse to " + x + "," + y);
+    robot.mouseMove(x, y);
+    robot.delay(1000);
+}
+
+public static void simulateMouse(Robot robot){
+    simulateMouse(robot, random.nextInt(10) + 10);
+}
+
+public static void simulateMouseMove(Robot robot){
+    int count = random.nextInt(5) + 5;
+    for (int i=0; i<=count; i++){
+        moveMouseRandom(robot);
+    }
+}
+
+public static void simulateKeybord(Robot robot, int count){
+    for (int i=0; i<=count; i++){
+        simulateKey(robot);
+    }
+}
+
+public static void simulateKey(Robot robot){
+    int key = random.nextInt(10);
+    switch(key){
+        case 0:
+        case 1: simulateType(robot, KeyEvent.VK_LEFT); break;
+        case 2:
+        case 3: simulateType(robot, KeyEvent.VK_RIGHT); break;
+        case 4:
+        case 5: simulateType(robot, KeyEvent.VK_UP); break;
+        case 6:
+        case 7: simulateType(robot, KeyEvent.VK_DOWN); break;
+        case 8: simulateType(robot, KeyEvent.VK_META, KeyEvent.VK_SHIFT, ']'); break;
+        case 9: simulateType(robot, KeyEvent.VK_META, KeyEvent.VK_SHIFT, '['); break;
+    }
+    robot.delay(300);
+}
+
+public static void simulateType(Robot robot, int... keycodes){
+    System.out.print("type ");
+    for (int keycode: keycodes)
+    {
+        System.out.print(keycode);
+        robot.keyPress(keycode);
+    }
+    System.out.println();
+    for (int keycode: keycodes)
+    {
+        robot.keyRelease(keycode);
+    }
+}
+
+public static void simulateMouse(Robot robot, int count){
+    for (int i=0; i<count; i++){
+        moveMouseRandom(robot);
+        if (random.nextBoolean()){
+            mouseClick(robot);
+        }
+        if (random.nextBoolean()){
+            mouseWheel(robot, random.nextInt(40) - 20);
+        }
+        robot.delay(random.nextInt(5000) + 5000);
+    }
+}
+
+public static void mouseClick(Robot robot){
+    System.out.println("Mouse click");
+    robot.mousePress(InputEvent.BUTTON1_MASK);
+    robot.mouseRelease(InputEvent.BUTTON1_MASK);
+}
+
+public static void mouseWheel(Robot robot, int wheelAmount){
+    System.out.println("Mouse wheel " + wheelAmount);
+    robot.mouseWheel(wheelAmount);
+}
+
+public static void moveMouseRandom(Robot robot){
+    Random random = new Random();
+    int x = random.nextInt(400)+500;
+    int y = random.nextInt(300)+200;
+    moveMouse(robot, x, y);
+}
+
+public static void typeRandom(Robot robot, int length){
+    Random random = new Random();
+    for (int i=0; i<length; i++){
+        robot.delay(500);
+        int keyCode = random.nextInt(200);
+        try
+        {
+            robot.keyPress(keyCode);
+            robot.keyRelease(keyCode);
+        } catch (Exception ex){
+            System.out.println((char)keyCode + " " + keyCode + " invalid");
+            i--;
+            continue;
+        }
+        System.out.println((char)keyCode + " " + keyCode);
+    }
+}
+
+private static Random random = new Random();
